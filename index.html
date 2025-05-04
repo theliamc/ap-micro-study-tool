@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AP Micro Graph Study Tool</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+        body {
+            font-family:"Lato", sans-serif;
+            background-color: #0c0c0c;
+            color: white;
+        }
+        .gameContainer {
+            display: flex;
+            margin: 20px;
+            padding: 15px;
+            padding-top: 20px;
+            padding-left: 20px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            justify-content: center;
+        }
+        .titles {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .gameSection {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .canvasContainer {
+            margin-right: 20px;
+            
+        }
+        
+        .drawingCanvas {
+            border: 1px solid #ccc;
+        }
+        
+        .referenceContainer {
+            position: relative;
+        }
+        
+        .coverBox {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 300px;
+            background-color: black;
+            cursor: pointer;
+        }
+        
+        .referenceImage {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .tools {
+            margin: 10px 0;
+            
+            align-items: center;
+        }
+        
+        .clearBtn {
+            margin-left: 10px;
+            justify-content: center;
+        }
+        
+        
+        h2 {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="titles">AP Micro Graph Study Tool</h1>
+    <p class="titles">Draw the graph from its name and then click the box on the right to reveal what it's supposed to look like</p>
+
+    <div id="gamesContainer"></div>
+
+    <script>
+        const gamePrompts = [
+            "Production Possibilities Curve",
+            "Supply and Demand",
+            "Supply and Demand (Price Ceiling)",
+            "Supply and Demand (Price Floor)",
+            "Supply and Demand (Excise Tax)",
+            "Supply and Demand (Trade)",
+            "Elasticity",
+            "Short Run Per Cost Curve",
+            "Short Run Total Cost Curve",
+            "Long Run Average Total Cost Curve",
+            "Perfect Competition (Short Run)",
+            "Perfect Competition (Long Run)",
+            "Non-Price Discrimination Monopoly",
+            "Monopolistic Competition (Short Run)",
+            "Monopolistic Competition (Long Run)",
+            "Natural Monopoly",
+            "Price Discrimination Monopoly",
+            "Oligopoly",
+            "Labor Markets (Minimum Wage)",
+            "Perfect Competition Resource Market and Firm",
+            "Monopsony",
+            "Positive Externalities",
+            "Negative Externalities",
+            "Lorenz Curve"
+        ];
+
+        const gamesContainer = document.getElementById('gamesContainer');
+
+        gamePrompts.forEach((prompt, index) => {
+            const gameNumber = index + 1;
+            const gameHTML = `
+                <div class="gameSection">
+                    <h2 class="titlePrompt">Draw: ${prompt}</h2>
+                    <div class="gameContainer">
+                        <div class="canvasContainer">
+                            <canvas id="canvas${gameNumber}" class="drawingCanvas" width="300" height="300"></canvas>
+                        </div>
+                        <div class="referenceContainer">
+                            <img src="image${gameNumber}.jpg" class="referenceImage">
+                            <div class="coverBox" id="cover${gameNumber}" onclick="revealImage(${gameNumber})"></div>
+                        </div>
+                    </div>
+                    <div class="tools">
+                        <button onclick="clearCanvas(${gameNumber})" class="clearBtn">Clear Canvas</button>
+                    </div>
+                </div>
+            `;
+            gamesContainer.innerHTML += gameHTML;
+        });
+
+        gamePrompts.forEach((_, index) => {
+            const gameNumber = index + 1;
+            const canvas = document.getElementById(`canvas${gameNumber}`);
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+
+            function startDrawing(e) {
+                isDrawing = true;
+                [lastX, lastY] = [e.offsetX, e.offsetY];
+            }
+
+            function draw(e) {
+                if (!isDrawing) return;
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+                [lastX, lastY] = [e.offsetX, e.offsetY];
+            }
+
+            function stopDrawing() {
+                isDrawing = false;
+            }
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+
+            
+            ctx.strokeStyle = '#000';
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.lineWidth = 2;
+        });
+
+        function clearCanvas(id) {
+            const canvas = document.getElementById(`canvas${id}`);
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function revealImage(id) {
+            const coverBox = document.getElementById(`cover${id}`);
+            coverBox.style.display = 'none';
+        }
+    </script>
+    <p class="titles">Refresh the page to do it again if you want</p>
+</body>
+</html>
